@@ -3,19 +3,22 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-interpreter = tf.lite.Interpreter(model_path="Waste classification.tflite")
+
+interpreter = tf.lite.Interpreter(model_path="Eco Sorter.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
-labels = {0: 'glass', 1: 'metal', 2: 'paper', 3: 'plastic'}
+#labels = {0: 'glass', 1: 'metal', 2: 'paper', 3: 'plastic'}
+labels = {0: 'glass', 1: 'metal', 2: 'paper', 3: 'plastic', 4 : 'unsorted waste'}
 
 def predict(img):
+    
     img = img.resize((224, 224))
     img_array = np.array(img).astype(np.float32) / 255.0
 
-    if img_array.shape[-1] == 4: 
+    if img_array.shape[-1] == 4:  
         img_array = img_array[:, :, :3]  
 
     img_array = np.expand_dims(img_array, axis=0)
@@ -27,7 +30,7 @@ def predict(img):
     predicted_label = labels[predicted_index]
 
     return predicted_label
-    
+
 interface = gr.Interface(
     fn=predict,
     inputs=gr.Image(type="pil"),
@@ -37,5 +40,4 @@ interface = gr.Interface(
     description="Upload a photo of the waste and we will classify it."
 )
 
-# تشغيل الواجهة
 interface.launch(show_error=True)
